@@ -47,11 +47,11 @@ newtype DFAStartState a = DFAStartState { runDFAStartState :: DFAState a }
 
 -- | TODO: Comment
 data DFAState a where
-  DFAState :: (Enum a, Bounded a) => { runDFAState :: a -> DFAState a } -> DFAState a
-  DFAAcceptState :: (Enum a, Bounded a) => { runDFAState :: a -> DFAState a } -> DFAState a
-  DFADeadState :: (Enum a, Bounded a) => { runDFAState :: a -> DFAState a } -> DFAState a
+  DFAState           :: (Enum a, Bounded a) => { runDFAState :: a -> DFAState a } -> DFAState a
+  DFAAcceptState     :: (Enum a, Bounded a) => { runDFAState :: a -> DFAState a } -> DFAState a
+  DFADeadState       :: (Enum a, Bounded a) => { runDFAState :: a -> DFAState a } -> DFAState a
   DFAAcceptDeadState :: (Enum a, Bounded a) => { runDFAState :: a -> DFAState a } -> DFAState a
-
+    
 -- | TODO: Comment
 nextDFAState :: a -> DFAState a -> DFAState a
 nextDFAState x s = runDFAState s x
@@ -69,18 +69,22 @@ computeDFA y ys = computeDFA' ys $ runDFAStartState . runDFA $ y
 minimizeDFA :: DFA a -> DFA a
 minimizeDFA = undefined
 
+-- | TODO: Comment
 deadDFAState :: (Enum a, Bounded a) => DFAState a
 deadDFAState = DFADeadState $ const deadDFAState
 
+-- | TODO: Comment
 deadDFAAcceptState :: (Enum a, Bounded a) => DFAState a
 deadDFAAcceptState = DFAAcceptDeadState $ const deadDFAAcceptState
-                     
+
+-- | TODO: Comment
 constToDFA :: (Eq a, Enum a, Bounded a) => [a] -> DFA a
 constToDFA [] = DFA $ DFAStartState $ DFAAcceptState $ const deadDFAState
 constToDFA ys = DFA $ DFAStartState $ constToDFA' ys
   where constToDFA' [] = DFAAcceptState $ const deadDFAState
         constToDFA' (x:xs) = DFAState $ \y -> if x == y then constToDFA' xs else deadDFAState
 
+-- | TODO: Comment
 kleeneStar :: (Eq a, Enum a, Bounded a) => a -> DFA a
 kleeneStar x = let s = DFAAcceptState $ \y -> if x == y then s else deadDFAState
                in DFA (DFAStartState s)
